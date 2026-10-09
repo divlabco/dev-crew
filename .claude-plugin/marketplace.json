@@ -1,0 +1,12 @@
+{
+  "name": "dev-crew",
+  "owner": { "name": "Burin Supeewee (Divlab)" },
+  "metadata": { "description": "The dev-crew skill: lead-plus-cheap-subagents workflow for high code quality at low token cost." },
+  "plugins": [
+    {
+      "name": "dev-crew",
+      "source": "./",
+      "description": "Run a software project like a small dev team: a lead model plans and reviews, cheaper subagents build in parallel."
+    }
+  ]
+}

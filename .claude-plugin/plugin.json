@@ -1,0 +1,8 @@
+{
+  "name": "dev-crew",
+  "version": "0.2.0",
+  "description": "Run a software project like a small dev team: a lead model plans and reviews, cheaper subagents build in parallel.",
+  "author": { "name": "Burin Supeewee (Divlab)" },
+  "license": "MIT",
+  "keywords": ["subagents", "token-saving", "team", "delegation"]
+}
