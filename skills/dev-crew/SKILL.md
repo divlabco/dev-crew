@@ -7,6 +7,14 @@ description: Run a software project like a small dev team for high code quality 
 
 You are the **tech lead**. Turn the plan into decisions, split it into tasks that can't collide, brief each agent tightly, verify the results, and report the truth. Spend tokens on judgment, not typing.
 
+## Pick the mode first
+Spawning a subagent costs ~50k tokens of fresh context before it does any work, and the full process (decisions file, briefs, reviews) costs more on top. Pay that only when the savings can cover it.
+
+- **Light mode (default)** when you are a mid-tier model, **or** the work touches under ~10 files, **or** it fits in one sitting. Work alone. Skip `docs/decisions.md` and briefs. Still apply the safety rules, the quality rules and the step 7 report. You may hand one big, fully specified chunk to the Specialist when it clears the spawn threshold below.
+- **Crew mode** when you are the strongest tier **and** the work is large (many files, several milestones, or independent parallel slices). Use the full workflow below.
+
+**Spawn threshold:** delegate a task only if it will take ~3× the spawn cost to do yourself (roughly 300+ lines or several files of writing). Batch small related tasks into one brief for one agent.
+
 ## Roles
 
 | Role | Tier (examples) | Gets |
@@ -20,6 +28,8 @@ Routing:
 - If the agent must choose an approach, it goes to the Builder.
 - If it needs this conversation or the user's judgment, you do it yourself.
 - If it is a fix you already understand and is under about 20 lines, you do it yourself. Briefing would cost more.
+- **Delegate down, never sideways.** Delegate only to a model cheaper than you. If you are already mid-tier (e.g. Sonnet leading), there is no Builder: do judgment work yourself and send only fully specified work to the Specialist. A same-tier subagent adds a brief and a review and saves nothing.
+- **Use the Specialist.** Spec'd units, tests from a written list, docs, scripts and restyles go to the small model by default. If you write the acceptance checks, you can afford to let it fail once.
 
 ## Workflow
 1. **Critique the plan.** Read the spec once and check the real environment (repo, versions, running services). Ask the user only the questions that block the work, with your recommended option first.
@@ -31,6 +41,7 @@ Routing:
 4. **Brief like a contractor.** Use `references/brief-template.md`. Point agents to files and line ranges instead of pasting contents, and name the modules they should reuse.
 5. **Verify, don't relay.**
    - Re-run the checks yourself.
+   - **Read every delegated diff** before accepting it, scoped: `git diff --stat`, then only public interfaces, calls into code you own (API paths, shapes, auth headers) and risky logic. A report is a claim, not evidence. Never relay code you have not opened.
    - Spot-read the risky logic (auth, money, scoring, state) against the decisions file.
    - Review with operational context the agents lack: real traffic versus rate limits, stale long-running workers, defaults that only pass in tests.
    - Commit Specialist work yourself, by path.
@@ -72,7 +83,8 @@ Routing:
 - **Point, don't paste.** Agents read excerpts and search before opening whole files.
 - **One decisions file.** Reference it; never re-explain policy in each prompt.
 - **Cap reports at 15 lines.** They contain files, check results as numbers, deviations, open issues, and what was NOT verified. No code echoes.
-- **Reuse agents.** Message an existing agent for a follow-up instead of spawning a fresh one.
+- **Use the crew agents.** Spawn `crew-specialist` (small model) and `crew-builder` (mid model) when this plugin provides them. They have a lean tool set and a pinned model; `general-purpose` costs more context and runs on your tier.
+- **Reuse agents.** Send follow-ups on the same files to the agent that already has them in context (SendMessage) instead of spawning a fresh one.
 - **No double-reading.** Re-run checks and spot-read only the risky parts.
 - **Stop loops.** After 2 failed attempts at the same thing, diagnose or ask.
 - **Background parallel work.** Don't poll; wait for the completion notice.
@@ -100,5 +112,7 @@ Routing:
 - Spawning agents before the decisions are written
 - Two agents editing one file at the same time
 - Relaying "all tests pass" without re-running the checks
+- Accepting a subagent's work from its report without reading its diff
+- Delegating to a model of the same tier as the lead
 - Giving a small model open-ended design work, or making the lead write boilerplate
 - Status updates that bury the one action the user must take

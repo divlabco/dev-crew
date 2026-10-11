@@ -2,7 +2,13 @@
 
 **Run your AI coding agent like a tech lead running a small dev team.**
 
-One strong model plans, decides, reviews and integrates. Cheaper models build in parallel. The skill is designed to keep code quality high, spend fewer tokens on routine work, and produce honest reports about what is actually verified. See [EVAL.md](EVAL.md) for measured results.
+One strong model plans, decides, reviews and integrates. On large jobs, cheaper models build in parallel. On everything else the skill runs in **light mode**: the lead works alone under the same safety rules, quality rules and honest reports.
+
+> **What we measured** ([EVAL.md](EVAL.md)): this covers mid-sized builds with current models (Sonnet 5.5, Opus 5.5).
+> - The skill did **not** make the code more correct, cheaper or faster. Both conditions passed every hidden test.
+> - It cost about 10% more with a Sonnet lead, and about 17% more with an Opus lead in crew mode.
+> - What it adds: reports that always state what was *not* verified, a review of every delegated diff, and guardrails.
+> - Whether crew mode pays off on very large, multi-hour jobs is not yet measured.
 
 ```
             ┌──────────────┐
@@ -39,8 +45,9 @@ These habits came from building a real-time web app end to end with one lead mod
 
 ```
 .claude-plugin/              plugin + marketplace manifests (the version lives here)
+agents/                      crew-specialist (Haiku) and crew-builder (Sonnet) subagents
 skills/dev-crew/
-  SKILL.md                   core (~1.2k words): roles, workflow, safety, quality, token economy, terse comms
+  SKILL.md                   core (~1.6k words): mode choice, roles, workflow, safety, quality, token economy, terse comms
   references/                loaded only when needed
     brief-template.md        the brief every subagent gets
     ui-ux.md                 design defaults when the user gives no direction
@@ -48,7 +55,8 @@ skills/dev-crew/
     solo-mode.md             tools without subagents; where to put the skill in other tools
   examples/                  a worked decisions file, briefs, and reports
 CHANGELOG.md                 what changed in each version
-EVAL.md                      A/B evaluation: method and results
+EVAL.md                      A/B evaluations: method and results
+evals/full-build/            specs, hidden acceptance tests and runner to reproduce them
 ```
 
 ## Install
